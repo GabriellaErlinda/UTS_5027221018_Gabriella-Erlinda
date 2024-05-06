@@ -8,9 +8,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/gabriellaerlinda/common/genproto/habittracker"
-	"github.com/gabriellaerlinda/common/repository"
-	"github.com/gabriellaerlinda/common/service"
+	"github.com/GabriellaErlinda/UTS_5027221018_Gabriella-Erlinda/common/genproto/habittracker"
+	"github.com/GabriellaErlinda/UTS_5027221018_Gabriella-Erlinda/common/repository"
+	"github.com/GabriellaErlinda/UTS_5027221018_Gabriella-Erlinda/common/service"
 	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"

@@ -1,4 +1,4 @@
-module github.com/gabriellaerlinda
+module github.com/GabriellaErlinda/UTS_5027221018_Gabriella-Erlinda
 
 go 1.22.0
 

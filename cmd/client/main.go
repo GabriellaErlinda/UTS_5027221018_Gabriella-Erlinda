@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/gabriellaerlinda/common/genproto/habittracker"
+	"github.com/GabriellaErlinda/UTS_5027221018_Gabriella-Erlinda/common/genproto/habittracker"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -201,74 +201,135 @@ var habitsTemplate = `
     <title>Habit Tracker</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #F6F3E3;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1 class="my-4">Daily Habit Tracker</h1>
-        <form action="/create" method="post">
-            <div class="form-group">
-                <label for="title">Habit name:</label>
-                <input type="text" class="form-control" id="title" name="title">
-            </div>
-            <div class="form-group">
-                <label for="description">Description:</label>
-                <textarea class="form-control" id="description" name="description"></textarea>
-            </div>
-            <input type="submit" class="btn btn-success" value="Create Habit">
-        </form>
-        <hr>
-        <h2 class="mb-4">Habit List</h2>
-        <a href="/list" class="btn btn-primary mb-3">
+	<nav class="navbar navbar-expand-lg navbar-dark bg-info">
+		<a class="navbar-brand" href="#">Habit Tracker</a>
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarNav">
+			<ul class="navbar-nav">
+				<li class="nav-item">
+					<a class="nav-link" href="#">Home</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="#">Habits</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="#">About</a>
+				</li>
+			</ul>
+		</div>
+	</nav>
+
+    <div class="container-fluid">
+		<h1 class="my-4">Daily Habit Tracker</h1>
+		<form action="/create" method="post">
+			<div class="form-group">
+				<label for="title">Habit name:</label>
+				<input type="text" class="form-control" id="title" name="title">
+			</div>
+			<div class="form-group">
+				<label for="description">Description:</label>
+				<textarea class="form-control" id="description" name="description"></textarea>
+			</div>
+			<input type="submit" class="btn btn-success" value="Create Habit">
+		</form>
+		<hr>
+		<!-- Progress Bar -->
+		<div class="progress mb-4">
+			<div id="progress-bar" class="progress-bar bg-success" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+		</div>
+		<!-- Reset Button -->
+		<button id="reset-btn" class="btn btn-danger mb-3" onclick="resetHabits()">Reset</button>
+		<h2 class="mb-4">Habit List</h2>
+		<a href="/list" class="btn btn-primary mb-3">
 			<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-arrow-repeat" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
 				<path fill-rule="evenodd" d="M8 0a8 8 0 1 0 8 8A8 8 0 0 0 8 0zM3.08 8A5.96 5.96 0 0 1 8 2.97v1.02A5 5 0 1 0 9 8.13H8a.5.5 0 0 1 0-1h3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0V7.03A7 7 0 1 1 3.08 8z"/>
 			</svg>
 			<span class="sr-only">Refresh Habit List</span>
 		</a>
-        <ul class="list-group">
-            {{if not (eq (len .Habits) 0)}}
-                {{range .Habits}}
-                <li class="list-group-item">
-                    <div class="card-body">
-                        <h5 class="card-title">{{.Title}}</h5>
-                        <p class="card-text text-muted">{{.Description}}</p>
-                        <div class="text-right">
-                            <button class="btn btn-primary" onclick="showUpdateForm('{{.Id}}')">Update</button>
-                            <a href="/delete?id={{.Id}}" class="btn btn-danger ml-2">Delete</a>
-                        </div>
-                    </div>
-            
-                    <form id="updateForm{{.Id}}" class="update-form mt-3" action="/update" method="post" style="display: none;">
-                        <input type="hidden" name="id" value="{{.Id}}">
-                        <div class="form-group">
-                            <label for="title{{.Id}}">New Habit:</label>
-                            <input type="text" class="form-control" id="title{{.Id}}" name="title" value="{{.Title}}">
-                        </div>
-                        <div class="form-group">
-                            <label for="description{{.Id}}">New Description:</label>
-                            <textarea class="form-control" id="description{{.Id}}" name="description">{{.Description}}</textarea>
-                        </div>
-                        <input type="submit" class="btn btn-success" value="Update Habit">
-                        <a href="/list" class="btn btn-danger ml-2">Back</a>
-                    </form>
-                </li>
-                {{end}}
-            {{else}}
-                <li class="list-group-item">No habits available</li>
-            {{end}}
-        </ul>
+		<ul class="list-group">
+			{{if not (eq (len .Habits) 0)}}
+				{{range .Habits}}
+				<li class="list-group-item">
+					<div class="card-body">
+						<h5 class="card-title">{{.Title}}</h5>
+						<p class="card-text text-muted">{{.Description}}</p>
+						<div class="text-right">
+							<input type="checkbox" id="habit{{.Id}}" onchange="updateProgress()">
+							<label for="habit{{.Id}}" class="mr-3">Done</label>
+							<button class="btn btn-primary" onclick="showUpdateForm('{{.Id}}')">Update</button>
+							<button class="btn btn-danger ml-2" onclick="confirmDelete('{{.Id}}')">Delete</button>
+						</div>
+					</div>
+			
+					<form id="updateForm{{.Id}}" class="update-form mt-3" action="/update" method="post" style="display: none;">
+						<input type="hidden" name="id" value="{{.Id}}">
+						<div class="form-group">
+							<label for="title{{.Id}}">New Habit:</label>
+							<input type="text" class="form-control" id="title{{.Id}}" name="title" value="{{.Title}}">
+						</div>
+						<div class="form-group">
+							<label for="description{{.Id}}">New Description:</label>
+							<textarea class="form-control" id="description{{.Id}}" name="description">{{.Description}}</textarea>
+						</div>
+						<input type="submit" class="btn btn-success" value="Update Habit">
+						<a href="/list" class="btn btn-danger ml-2">Back</a>
+					</form>
+				</li>
+				{{end}}
+			{{else}}
+				<li class="list-group-item">No habits available</li>
+			{{end}}
+		</ul>
     </div>
 
-    <script>
-        function showUpdateForm(habitId) {
-            var formId = 'updateForm' + habitId;
-            var form = document.getElementById(formId);
-            if (form.style.display === 'none') {
-                form.style.display = 'block';
-            } else {
-                form.style.display = 'none';
-            }
+<script>
+    function showUpdateForm(habitId) {
+        var formId = 'updateForm' + habitId;
+        var form = document.getElementById(formId);
+        if (form.style.display === 'none') {
+            form.style.display = 'block';
+        } else {
+            form.style.display = 'none';
         }
-    </script>
+    }
+
+    function updateProgress() {
+        var checkboxes = document.querySelectorAll('.list-group-item input[type="checkbox"]');
+        var checkedCount = 0;
+        checkboxes.forEach(function(checkbox) {
+            if (checkbox.checked) {
+                checkedCount++;
+            }
+        });
+        var totalCount = checkboxes.length;
+        var progress = (checkedCount / totalCount) * 100;
+        document.getElementById('progress-bar').style.width = progress + '%';
+        document.getElementById('progress-bar').setAttribute('aria-valuenow', progress.toString());
+    }
+
+    function resetHabits() {
+        var checkboxes = document.querySelectorAll('.list-group-item input[type="checkbox"]');
+        checkboxes.forEach(function(checkbox) {
+            checkbox.checked = false;
+        });
+        updateProgress(); // Reset progress bar
+    }
+
+    function confirmDelete(habitId) {
+        if (confirm("Are you sure to delete this habit?")) {
+            window.location.href = "/delete?id=" + habitId;
+        }
+    }
+</script>
 </body>
 </html>
 `

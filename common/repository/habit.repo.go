@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/gabriellaerlinda/common/model"
+	"github.com/GabriellaErlinda/UTS_5027221018_Gabriella-Erlinda/common/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"

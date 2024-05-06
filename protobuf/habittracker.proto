@@ -5,7 +5,7 @@ package protoapi;
 import "google/protobuf/Empty.proto";
 import "google/protobuf/Wrappers.proto";
 
-option go_package = "github.com/GabriellaErlinda/common/habittracker";
+option go_package = "github.com/GabriellaErlinda/UTS_5027221018_Gabriella-Erlinda/common/habittracker";
 
 // entitas Habit
 message Habit {

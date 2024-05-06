@@ -3,10 +3,9 @@ package service
 import (
 	"context"
 	"log"
-
-	"github.com/GabriellaErlinda/common/genproto/habitmaster"
-	"github.com/GabriellaErlinda/common/model"
-	"github.com/GabriellaErlinda/common/repository"
+	"github.com/GabriellaErlinda/UTS_5027221018_Gabriella-Erlinda/common/genproto/habittracker"
+	"github.com/GabriellaErlinda/UTS_5027221018_Gabriella-Erlinda/common/model"
+	"github.com/GabriellaErlinda/UTS_5027221018_Gabriella-Erlinda/common/repository"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/golang/protobuf/ptypes/wrappers"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -26,7 +25,7 @@ func NewHabitService(repo *repository.HabitRepository) *HabitService {
 }
 
 // buat habit
-func (s *HabitService) CreateHabit(ctx context.Context, tm *habitmaster.Habit) (*habitmaster.Habit, error) {
+func (s *HabitService) CreateHabit(ctx context.Context, tm *habittracker.Habit) (*habittracker.Habit, error) {
 	log.Printf("CreateHabit(%v) \n", tm)
 
 	newHabit := &model.Habit{
@@ -44,10 +43,10 @@ func (s *HabitService) CreateHabit(ctx context.Context, tm *habitmaster.Habit) (
 }
 
 // dapatin semua habit
-func (s *HabitService) ListHabits(ctx context.Context, e *empty.Empty) (*habitmaster.HabitList, error) {
+func (s *HabitService) ListHabits(ctx context.Context, e *empty.Empty) (*habittracker.HabitList, error) {
 	log.Printf("ListHabits() \n")
 
-	var totas []*habitmaster.Habit
+	var totas []*habittracker.Habit
 	Habits, err := s.repo.FindAll()
 	if err != nil {
 		log.Printf("%v", err)
@@ -58,7 +57,7 @@ func (s *HabitService) ListHabits(ctx context.Context, e *empty.Empty) (*habitma
 		totas = append(totas, s.toHabit(&u))
 	}
 
-	HabitList := &habitmaster.HabitList{
+	HabitList := &habittracker.HabitList{
 		List: totas,
 	}
 
@@ -66,7 +65,7 @@ func (s *HabitService) ListHabits(ctx context.Context, e *empty.Empty) (*habitma
 }
 
 // update habit
-func (s *HabitService) UpdateHabit(ctx context.Context, tm *habitmaster.Habit) (*habitmaster.Habit, error) {
+func (s *HabitService) UpdateHabit(ctx context.Context, tm *habittracker.Habit) (*habittracker.Habit, error) {
 	log.Printf("UpdateHabit(%v) \n", tm)
 
 	if tm.Id == "" {
@@ -108,8 +107,8 @@ func (s *HabitService) DeleteHabit(ctx context.Context, id *wrappers.StringValue
 }
 
 // map habit ke toHabit
-func (s *HabitService) toHabit(u *model.Habit) *habitmaster.Habit {
-	tota := &habitmaster.Habit{
+func (s *HabitService) toHabit(u *model.Habit) *habittracker.Habit {
+	tota := &habittracker.Habit{
 		Id:          u.ID.Hex(),
 		Title:       u.Title,
 		Description: u.Description,
